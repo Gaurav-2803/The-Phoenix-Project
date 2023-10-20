@@ -1,4 +1,4 @@
-# Inbuild Imports
+# Inbuilt Imports
 import socket
 import subprocess
 
@@ -23,7 +23,7 @@ class ScriptInvoke:
 
     # Fetching Type of Error
     @staticmethod
-    def __get_response(__url):
+    def __get_response(__url: str) -> int or str:
         try:
             response = requests.get(__url).status_code
             return response
@@ -39,12 +39,12 @@ class ScriptInvoke:
         )
 
         if response_type == "Request Error":
-            self.check_request_error()
+            self.__check_request_error()
         else:
-            self.check_network_error()
+            self.__check_network_error()
 
     # Intialize scripts to fix 'Request' errors
-    def check_request_error(self):
+    def __check_request_error(self):
         self.error_name = self.__get_response(self.url)
 
         if self.error_name in REQUEST_EXCEPTION:
@@ -59,7 +59,7 @@ class ScriptInvoke:
             raise NotImplementedError(f"No script for {self.error_name}")
 
     # Intialize scripts to fix 'Network' errors
-    def check_network_error(self):
+    def __check_network_error(self):
         self.error_name = self.__get_response(self.url)
 
         accepted_code = {200, 201, 202}
