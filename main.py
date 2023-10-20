@@ -19,7 +19,7 @@ class ScriptInvoke:
         # Arslaan
         # self.url = "http://52.66.204.129:8000"
         # Gaurav
-        # self.url = "http://3.7.252.171:80"
+        # self.url = "http://13.126.152.107:80"
 
     # Fetching Type of Error
     @staticmethod
@@ -37,7 +37,6 @@ class ScriptInvoke:
             if isinstance(self.__get_response(self.url), int)
             else "Request Error"
         )
-
         if response_type == "Request Error":
             self.__check_request_error()
         else:
@@ -52,7 +51,7 @@ class ScriptInvoke:
             subprocess.run(
                 [
                     "sh",
-                    f"scripts\\request\\{self.bash_file}",
+                    f"lib\\scripts\\request\\{self.bash_file}",
                 ]
             )
         else:
@@ -64,6 +63,7 @@ class ScriptInvoke:
 
         accepted_code = {200, 201, 202}
         if self.error_name in accepted_code:
+            print("Running OK")
             return "Running OK"
 
         elif self.error_name in NETWORK_EXCEPTION:
@@ -71,7 +71,7 @@ class ScriptInvoke:
             subprocess.run(
                 [
                     "sh",
-                    f"scripts\\network\\{self.bash_file}\\{self.bash_file}",
+                    f"lib\\scripts\\network\\{self.bash_file}\\{self.bash_file}",
                 ]
             )
         else:
