@@ -59,3 +59,5 @@ NETWORK_EXCEPTION = {
     504: "ServerErrorCodes\\504_GatewayTime-out.sh",
     505: "ServerErrorCodes\\505_HTTPVersionnotsupported.sh",
 }
+
+SYSTEM_EXCEPTION = {}

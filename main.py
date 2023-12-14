@@ -1,12 +1,15 @@
 # Inbuilt Imports
+import os
 import socket
 import subprocess
+import time
+from datetime import datetime as d
 
 # Third Party Imports
 import requests
 
 # User Imports
-from lib.script_files import NETWORK_EXCEPTION, REQUEST_EXCEPTION
+from lib.script_files import NETWORK_EXCEPTION, REQUEST_EXCEPTION, SYSTEM_EXCEPTION
 
 
 class ScriptInvoke:
@@ -14,12 +17,6 @@ class ScriptInvoke:
     def __init__(self):
         self.ip_address = socket.gethostbyname(socket.gethostname())
         self.url = f"https://{self.ip_address}"
-
-        # Testing IPs
-        # Arslaan
-        # self.url = "http://52.66.204.129:8000"
-        # Gaurav
-        # self.url = "http://13.126.152.107:80"
 
     # Fetching Type of Error
     @staticmethod
@@ -63,8 +60,12 @@ class ScriptInvoke:
 
         accepted_code = {200, 201, 202}
         if self.error_name in accepted_code:
-            print("Running OK")
-            return "Running OK"
+            while True:
+                if self.__check_system_error():
+                    print("System Error")
+                else:
+                    print("Running OK")
+                time.sleep(10)
 
         elif self.error_name in NETWORK_EXCEPTION:
             self.bash_file = NETWORK_EXCEPTION.get(self.error_name)
@@ -76,6 +77,33 @@ class ScriptInvoke:
             )
         else:
             raise NotImplementedError(f"No script for {self.error_name}")
+
+    @staticmethod
+    def __check_system_error():
+        os.chdir("../../../var/log")
+        log_file = open("syslog", "r")
+        logs = log_file.readlines()
+        filterd_logs = []
+
+        for log in logs[::-1]:
+            line = log.split(" ")[:6]
+
+            # Check Time
+            now = d.utcnow()
+            start_time = d.strptime(" ".join(line[:3]), "%b %d %H:%M:%S")
+            end_time = now.strftime("%b %d %H:%M:%S")
+            end_time = d.strptime(end_time, "%b %d %H:%M:%S")
+            time_diff = abs((end_time - start_time).total_seconds())
+
+            log_title, error = line[4:6]
+
+            if time_diff <= 30:
+                if "systemd" in log_title and error in SYSTEM_EXCEPTION:
+                    filterd_logs.append(log)
+            else:
+                break
+
+        return not filterd_logs
 
 
 if __name__ == "__main__":
